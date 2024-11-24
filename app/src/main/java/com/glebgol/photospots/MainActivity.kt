@@ -4,6 +4,7 @@ import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.glebgol.photospots.databinding.ActivityMainBinding
+import com.glebgol.photospots.domain.ApiClient
 import com.glebgol.photospots.domain.MapController
 import com.glebgol.photospots.domain.MapControllerFactory
 import com.glebgol.photospots.domain.location.LocationClient
@@ -55,7 +56,8 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        mapController.invalidateMap()
+
+
     }
 
     private fun loadOSMdroidConfiguration() {
