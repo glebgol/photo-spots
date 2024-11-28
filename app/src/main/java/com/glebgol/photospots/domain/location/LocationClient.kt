@@ -18,8 +18,8 @@ class LocationClient(
     private var locationRequest: LocationRequest = createLocationRequest()
 
     companion object {
-        private const val UPDATE_INTERVAL: Long = 10000 // 10 seconds
-        private const val FASTEST_INTERVAL: Long = 5000 // 5 seconds
+        private const val UPDATE_INTERVAL: Long = 10000
+        private const val FASTEST_INTERVAL: Long = 5000
     }
 
     private fun createLocationRequest(): LocationRequest {

@@ -7,5 +7,5 @@ interface MapController {
     fun initMap()
     fun updateLocation(newLocation: Location)
     fun addMarker(title: String, position: GeoPoint)
-    fun invalidateMap()
+    fun showMap()
 }

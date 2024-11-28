@@ -1,4 +1,4 @@
-package com.glebgol.photospots.domain
+package com.glebgol.photospots.domain.client
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

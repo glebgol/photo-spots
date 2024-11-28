@@ -19,7 +19,7 @@ class GoogleMapController(private val googleMap: GoogleMap) : MapController {
         TODO("Not yet implemented")
     }
 
-    override fun invalidateMap() {
+    override fun showMap() {
         TODO("Not yet implemented")
     }
 }
