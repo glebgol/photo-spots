@@ -1,5 +1,6 @@
 package com.glebgol.photospots
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -70,6 +71,10 @@ class CreateTagActivity : ComponentActivity() {
                             if (response.isSuccessful) {
                                 val tag = response.body()
                                 Log.i("Tagcreated","Tagcreated!: $tag")
+                                val resultIntent = Intent()
+                                resultIntent.putExtra("NEW_TAG", tag) // Pass the tag as an extra
+                                setResult(RESULT_OK, resultIntent)
+                                finish() // Finish the activity and return to MainActivity
                             } else {
                                 Log.w("Error",
                                     "Error while creating tag: ${response.code()} - ${response.message()}")

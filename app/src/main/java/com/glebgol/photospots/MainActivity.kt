@@ -1,41 +1,40 @@
 package com.glebgol.photospots
 
+import android.app.Activity
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.widget.Button
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import com.glebgol.photospots.databinding.ActivityMainBinding
 import com.glebgol.photospots.domain.MapController
 import com.glebgol.photospots.domain.MapControllerFactory
+import com.glebgol.photospots.domain.data.TagDetails
 import com.glebgol.photospots.domain.location.LocationClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private lateinit var map: MapView
     private lateinit var mapController: MapController
 
     private val mapControllerFactory: MapControllerFactory = MapControllerFactory()
     private val REQUEST_IMAGE_CAPTURE = 1
+    private lateinit var createTagLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var locationClient: LocationClient
     private lateinit var photoTaker: PhotoTaker
-    private lateinit var lastLocation: Location
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            for (location in locationResult.locations) {
-                updateUIWithLocation(location)
+            locationResult.lastLocation?.let {
+//                mapController.updateLocation(it)
             }
-        }
-    }
-
-    private fun updateUIWithLocation(location: Location?) {
-        if (location != null) {
-            mapController.updateLocation(location)
         }
     }
 
@@ -45,18 +44,15 @@ class MainActivity : ComponentActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        loadOSMdroidConfiguration()
-
         map = binding.map
-        mapController = mapControllerFactory.createMapController(map)
+        mapController = mapControllerFactory.createMapController(this, map)
         mapController.initMap()
 
         locationClient = LocationClient(this, locationCallback)
         locationClient.startLocationUpdates()
         locationClient.getLastKnownLocation { location ->
             location?.let {
-                updateUIWithLocation(it)
-                lastLocation = location
+                mapController.updateLocation(it)
             }
         }
 
@@ -66,13 +62,19 @@ class MainActivity : ComponentActivity() {
         cameraBtn.setOnClickListener {
             photoTaker.openCamera()
         }
-    }
 
-    private fun loadOSMdroidConfiguration() {
-        Configuration.getInstance().load(
-            applicationContext,
-            getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE)
-        )
+        createTagLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let { data ->
+                    val newTag = data.getSerializableExtra("NEW_TAG") as TagDetails?
+                    newTag?.let {
+                        mapController.addMarker(newTag)
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -92,14 +94,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
-            val intent = Intent(this, CreateTagActivity::class.java).apply {
+            createTagLauncher.launch(Intent(this, CreateTagActivity::class.java).apply {
                 putExtra("imageUri", photoTaker.photoUri.toString())
                 putExtra("file", photoTaker.file?.path)
-            }
-
-            startActivity(intent)
+            })
 
             setResult(RESULT_OK, intent)
         }

@@ -71,7 +71,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.androidx.appcompat)
     implementation(libs.play.services.maps)
-
+    implementation(libs.glide)
+    implementation(libs.material)
+//    kapt(libraries.glide-compiler) // Use kapt for annotation processing with Glide
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)
