@@ -44,7 +44,6 @@ class CreateTagActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_tag)
-        super.onStart()
 
         locationClient = LocationClient(this)
 

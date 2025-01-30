@@ -40,7 +40,7 @@ class OSMDroidMapController(private val activity: AppCompatActivity, private val
         mapController = map.controller
         mapController.setZoom(7.0)
         map.minZoomLevel = 3.0
-        fetchTags()
+//        fetchTags()
 
         map.setVerticalMapRepetitionEnabled(false)
         map.setHorizontalMapRepetitionEnabled(false)
