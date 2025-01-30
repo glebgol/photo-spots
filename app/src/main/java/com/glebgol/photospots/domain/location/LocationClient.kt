@@ -11,7 +11,6 @@ import com.google.android.gms.location.*
 
 class LocationClient(
     private val context: Context,
-    private val locationCallback: LocationCallback
 ) {
     private var fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
@@ -34,14 +33,14 @@ class LocationClient(
     fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Handle permission not granted
+
             return
         }
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        fusedLocationClient.requestLocationUpdates(locationRequest, {}, Looper.getMainLooper())
     }
 
     fun stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
+        fusedLocationClient.removeLocationUpdates({})
     }
 
     @SuppressLint("MissingPermission")

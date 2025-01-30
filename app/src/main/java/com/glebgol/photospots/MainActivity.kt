@@ -1,42 +1,35 @@
 package com.glebgol.photospots
 
-import android.app.Activity
 import android.content.Intent
-import android.location.Location
 import android.os.Bundle
 import android.widget.Button
-import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModelProvider
 import com.glebgol.photospots.databinding.ActivityMainBinding
 import com.glebgol.photospots.domain.MapController
 import com.glebgol.photospots.domain.MapControllerFactory
+import com.glebgol.photospots.domain.data.Tag
 import com.glebgol.photospots.domain.data.TagDetails
 import com.glebgol.photospots.domain.location.LocationClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var map: MapView
     private lateinit var mapController: MapController
 
     private val mapControllerFactory: MapControllerFactory = MapControllerFactory()
-    private val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var createTagLauncher: ActivityResultLauncher<Intent>
+    private lateinit var takePhotoLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var locationClient: LocationClient
     private lateinit var photoTaker: PhotoTaker
 
-    private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            locationResult.lastLocation?.let {
-//                mapController.updateLocation(it)
-            }
-        }
-    }
+    private lateinit var viewModel : MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,11 +37,17 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+
+//        viewModel.geoTags.observe(this) {
+//            addTagsOnMap(it)
+//        }
+
         map = binding.map
         mapController = mapControllerFactory.createMapController(this, map)
         mapController.initMap()
 
-        locationClient = LocationClient(this, locationCallback)
+        locationClient = LocationClient(this)
         locationClient.startLocationUpdates()
         locationClient.getLastKnownLocation { location ->
             location?.let {
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         photoTaker = PhotoTaker(this)
 
         cameraBtn.setOnClickListener {
-            photoTaker.openCamera()
+            takePhotoLauncher.launch(Intent(this, HighQualityPhotoTakerActivity::class.java))
         }
 
         createTagLauncher = registerForActivityResult(
@@ -75,6 +74,28 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        takePhotoLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let { data ->
+                    val imageUri = data.getStringExtra("imageUri")
+                    val filePath = data.getStringExtra("filePath")
+
+                    createTagLauncher.launch(Intent(this, CreateTagActivity::class.java).apply {
+                        putExtra("imageUri", imageUri)
+                        putExtra("filePath", filePath)
+                    })
+                }
+            }
+        }
+
+    }
+
+
+    private fun addTagsOnMap(it: List<Tag>?): List<Tag>? {
+        TODO("Not yet implemented")
     }
 
     override fun onResume() {
@@ -92,17 +113,4 @@ class MainActivity : AppCompatActivity() {
         locationClient.stopLocationUpdates()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-
-            createTagLauncher.launch(Intent(this, CreateTagActivity::class.java).apply {
-                putExtra("imageUri", photoTaker.photoUri.toString())
-                putExtra("file", photoTaker.file?.path)
-            })
-
-            setResult(RESULT_OK, intent)
-        }
-    }
 }

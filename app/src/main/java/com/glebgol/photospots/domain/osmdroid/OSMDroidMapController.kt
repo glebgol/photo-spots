@@ -4,12 +4,15 @@ import android.location.Location
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
+import androidx.compose.ui.node.getOrAddAdapter
 import com.glebgol.photospots.R
 import com.glebgol.photospots.TagDetailBottomSheetFragment
+import com.glebgol.photospots.data.DefaultTagRepository
 import com.glebgol.photospots.domain.MapController
 import com.glebgol.photospots.domain.client.ApiClient
 import com.glebgol.photospots.domain.data.Tag
 import com.glebgol.photospots.domain.data.TagDetails
+import kotlinx.coroutines.runBlocking
 import org.osmdroid.api.IMapController
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -25,22 +28,22 @@ import retrofit2.Response
 class OSMDroidMapController(private val activity: AppCompatActivity, private val map: MapView) :
     MapController {
 
-    lateinit var mapController: IMapController
+    private lateinit var mapController: IMapController
 
     override fun initMap() {
         loadOSMdroidConfiguration()
+        val repository = DefaultTagRepository()
 
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
 
         mapController = map.controller
         mapController.setZoom(7.0)
-        map.minZoomLevel = 2.0
-
+        map.minZoomLevel = 3.0
         fetchTags()
 
         map.setVerticalMapRepetitionEnabled(false)
-        map.setHorizontalMapRepetitionEnabled(false);
+        map.setHorizontalMapRepetitionEnabled(false)
 
         map.setScrollableAreaLimitLatitude(MapView.getTileSystem().maxLatitude, MapView.getTileSystem().minLatitude, 20)
         map.setScrollableAreaLimitLongitude(MapView.getTileSystem().minLongitude, MapView.getTileSystem().maxLongitude, 20)
@@ -55,6 +58,8 @@ class OSMDroidMapController(private val activity: AppCompatActivity, private val
 
     private fun fetchTags() {
         val call = ApiClient.tagApi.getTags()
+
+
         call.enqueue(object : Callback<List<Tag>> {
             override fun onResponse(call: Call<List<Tag>>, response: Response<List<Tag>>) {
                 if (response.isSuccessful && response.body() != null) {
@@ -63,7 +68,7 @@ class OSMDroidMapController(private val activity: AppCompatActivity, private val
                 } else {
                     Log.w(
                         "Error",
-                        "Error while gettin tags: ${response.code()} - ${response.message()}"
+                        "Error while getting tags: ${response.code()} - ${response.message()}"
                     )
                 }
             }

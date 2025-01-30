@@ -4,13 +4,11 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <ImageView
+    <com.glebgol.photospots.ResizableImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="259dp"
-        android:layout_gravity="center"
-        android:contentDescription="Captured Image"
-        android:scaleType="centerCrop" />
+        android:layout_height="wrap_content"
+        android:contentDescription="Captured Image"/>
 
     <Button
         android:id="@+id/captureButton"
