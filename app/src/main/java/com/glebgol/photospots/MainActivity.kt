@@ -11,25 +11,35 @@ import androidx.core.app.ActivityCompat
 import com.glebgol.photospots.databinding.ActivityMainBinding
 import com.glebgol.photospots.domain.data.Tag
 import com.glebgol.photospots.domain.data.TagDetails
-import com.glebgol.photospots.presenter.DefaultMainPresenter
-import com.glebgol.photospots.presenter.MainPresenter
+import com.glebgol.photospots.presenter.impl.DefaultTagDetailsPresenter
+import com.glebgol.photospots.presenter.impl.DefaultTagsMapPresenter
+import com.glebgol.photospots.presenter.TagDetailsPresenter
+import com.glebgol.photospots.presenter.TagsMapPresenter
+import com.glebgol.photospots.view.TagDetailsView
+import com.glebgol.photospots.view.TagsMapView
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
-class MainActivity : AppCompatActivity(), MainView {
+class MainActivity : AppCompatActivity(), TagsMapView, TagDetailsView {
 
     private lateinit var map: MapView
 
     private lateinit var createTagLauncher: ActivityResultLauncher<Intent>
     private lateinit var takePhotoLauncher: ActivityResultLauncher<Intent>
 
-    private lateinit var mainPresenter: MainPresenter
+    private lateinit var tagsMapPresenter: TagsMapPresenter
+    private lateinit var tagsDetailsPresenter: TagDetailsPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Configuration.getInstance().load(
+            applicationContext,
+            getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE)
+        )
 
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -41,9 +51,11 @@ class MainActivity : AppCompatActivity(), MainView {
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
             1)
 
-        mainPresenter = DefaultMainPresenter(this, applicationContext)
-        mainPresenter.loadMapWithTags()
-        mainPresenter.updateLocation()
+        tagsMapPresenter = DefaultTagsMapPresenter(this, applicationContext)
+        tagsMapPresenter.loadMapWithTags()
+        tagsMapPresenter.updateLocation()
+
+        tagsDetailsPresenter = DefaultTagDetailsPresenter(this)
 
         val cameraBtn: Button = findViewById(R.id.cameraBtn)
 
@@ -82,25 +94,35 @@ class MainActivity : AppCompatActivity(), MainView {
 
     }
 
-    private fun loadOSMdroidConfiguration() {
-        Configuration.getInstance().load(
-            applicationContext,
-            getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE)
-        )
+    override fun showMapWithTags(tags: List<Tag>) {
+        initMap(map)
+        addTagsOnMap(tags)
     }
 
-    private fun addTagsOnMap(tags: List<Tag>) {
-        tags.forEach { tag ->
-            val marker = Marker(map)
-            marker.position = GeoPoint(tag.latitude, tag.longitude)
+    override fun showTagDetails(marker: Marker, tag: TagDetails) {
+        marker.title = tag.description
 
-            marker.setOnMarkerClickListener { _, _ ->
-                mainPresenter.loadTagDetails(marker, tag)
-                true
-            }
-            map.overlays.add(marker)
+        val dialog = TagDetailBottomSheetFragment(tag)
+        dialog.show(supportFragmentManager, "")
+    }
+
+    override fun updateLocation(latitude: Double, longitude: Double) {
+        map.controller.setCenter(GeoPoint(latitude, longitude))
+    }
+
+    override fun addMarker(tag: TagDetails) {
+        val marker = Marker(map)
+        marker.position = GeoPoint(tag.latitude, tag.longitude)
+        marker.setOnMarkerClickListener { _, _ ->
+            onTagClick(marker, Tag(tag.id, tag.longitude, tag.latitude))
         }
+        map.overlays.add(marker)
         map.invalidate()
+    }
+
+    private fun onTagClick(marker: Marker, tag: Tag): Boolean {
+        tagsDetailsPresenter.loadTagDetails(marker, tag)
+        return true
     }
 
     override fun onResume() {
@@ -115,12 +137,23 @@ class MainActivity : AppCompatActivity(), MainView {
 
     override fun onDestroy() {
         super.onDestroy()
-        mainPresenter.stop()
+        tagsMapPresenter.stopLocationUpdates()
     }
 
-    override fun showMapWithTags(tags: List<Tag>) {
-        loadOSMdroidConfiguration()
+    private fun addTagsOnMap(tags: List<Tag>) {
+        tags.forEach { tag ->
+            val marker = Marker(map)
+            marker.position = GeoPoint(tag.latitude, tag.longitude)
 
+            marker.setOnMarkerClickListener { _, _ ->
+                onTagClick(marker, tag)
+            }
+            map.overlays.add(marker)
+        }
+        map.invalidate()
+    }
+
+    private fun initMap(map: MapView) {
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
 
@@ -130,32 +163,11 @@ class MainActivity : AppCompatActivity(), MainView {
         map.setVerticalMapRepetitionEnabled(false)
         map.setHorizontalMapRepetitionEnabled(false)
 
-        map.setScrollableAreaLimitLatitude(MapView.getTileSystem().maxLatitude, MapView.getTileSystem().minLatitude, 20)
-        map.setScrollableAreaLimitLongitude(MapView.getTileSystem().minLongitude, MapView.getTileSystem().maxLongitude, 20)
-
-        addTagsOnMap(tags)
-    }
-
-    override fun showTagDetails(marker: Marker, tag: TagDetails) {
-        marker.title = tag.description
-
-        val dialog = TagDetailBottomSheetFragment.newInstance(tag)
-        dialog.show(supportFragmentManager, "")
-    }
-
-    override fun updateLocation(latitude: Double, longitude: Double) {
-        map.controller.setCenter(GeoPoint(latitude, longitude))
-    }
-
-    override fun addMarker(tag: TagDetails) {
-        val marker = Marker(map)
-        marker.position = GeoPoint(tag.latitude, tag.longitude)
-        marker.setOnMarkerClickListener { _, _ ->
-            mainPresenter.loadTagDetails(marker, Tag(tag.id, tag.longitude, tag.latitude))
-            true
-        }
-        map.overlays.add(marker)
-        map.invalidate()
+        val tileSystem = MapView.getTileSystem()
+        map.setScrollableAreaLimitLatitude(MapView.getTileSystem().maxLatitude,
+            tileSystem.minLatitude, 20)
+        map.setScrollableAreaLimitLongitude(MapView.getTileSystem().minLongitude,
+            tileSystem.maxLongitude, 20)
     }
 
 }

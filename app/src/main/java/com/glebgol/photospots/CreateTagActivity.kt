@@ -67,14 +67,11 @@ class CreateTagActivity : ComponentActivity() {
 
         filePath = intent.getStringExtra("filePath")
         imageURI = intent.getStringExtra("imageUri")
-//        imageView.setImageURI(Uri.parse(imageURI))
-//        imageView.adjustViewBounds
+
         Glide.with(this)
             .load(imageURI)
             .into(imageView)
-//        imageView.layoutParams = LinearLayout.LayoutParams(400, 400)
-//        imageView.x = 20F //setting margin from left
-//        imageView.y = 20F
+
         captureButton.setOnClickListener {
             takePhotoLauncher.launch(Intent(applicationContext, HighQualityPhotoTakerActivity::class.java))
         }
@@ -125,10 +122,6 @@ class CreateTagActivity : ComponentActivity() {
             }
         }
     }
-
-
-
-
 
     private fun updateUI() {
         imageView.setImageURI(Uri.parse(imageURI))

@@ -1,19 +1,18 @@
-package com.glebgol.photospots.presenter
+package com.glebgol.photospots.presenter.impl
 
 import android.content.Context
 import android.util.Log
-import com.glebgol.photospots.MainView
 import com.glebgol.photospots.domain.client.ApiClient
 import com.glebgol.photospots.domain.data.Tag
-import com.glebgol.photospots.domain.data.TagDetails
 import com.glebgol.photospots.domain.location.LocationClient
-import org.osmdroid.views.overlay.Marker
+import com.glebgol.photospots.presenter.TagsMapPresenter
+import com.glebgol.photospots.view.TagsMapView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DefaultMainPresenter(private val mainView: MainView, private val context: Context)
-    : MainPresenter {
+class DefaultTagsMapPresenter(private val view: TagsMapView, private val context: Context) :
+    TagsMapPresenter {
 
     private lateinit var locationClient: LocationClient
 
@@ -23,7 +22,7 @@ class DefaultMainPresenter(private val mainView: MainView, private val context: 
         call.enqueue(object : Callback<List<Tag>> {
             override fun onResponse(call: Call<List<Tag>>, response: Response<List<Tag>>) {
                 if (response.isSuccessful && response.body() != null) {
-                    mainView.showMapWithTags(response.body()!!)
+                    view.showMapWithTags(response.body()!!)
                 } else {
                     Log.w(
                         "Error",
@@ -43,33 +42,12 @@ class DefaultMainPresenter(private val mainView: MainView, private val context: 
         locationClient.startLocationUpdates()
         locationClient.getLastKnownLocation { location ->
             location?.let {
-                mainView.updateLocation(it.latitude, it.longitude)
+                view.updateLocation(it.latitude, it.longitude)
             }
         }
     }
 
-    override fun stop() {
+    override fun stopLocationUpdates() {
         locationClient.stopLocationUpdates()
-    }
-
-    override fun loadTagDetails(marker: Marker, tag: Tag) {
-        val call = ApiClient.tagApi.getTagById(tag.id)
-        call.enqueue(object : Callback<TagDetails> {
-            override fun onResponse(call: Call<TagDetails>, response: Response<TagDetails>) {
-                if (response.isSuccessful && response.body() != null) {
-                    val tagDetails = response.body()!!
-                    mainView.showTagDetails(marker, tagDetails)
-                } else {
-                    Log.w(
-                        "Error",
-                        "Error while getting tag details: ${response.code()} - ${response.message()}"
-                    )
-                }
-            }
-
-            override fun onFailure(call: Call<TagDetails>, t: Throwable) {
-                Log.e("Failure when getting tags", "Failure ${t.message}")
-            }
-        })
     }
 }
