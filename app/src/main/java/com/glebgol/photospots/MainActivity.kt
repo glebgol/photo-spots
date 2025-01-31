@@ -3,22 +3,14 @@ package com.glebgol.photospots
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProvider
 import com.glebgol.photospots.databinding.ActivityMainBinding
-import com.glebgol.photospots.domain.MapController
-import com.glebgol.photospots.domain.MapControllerFactory
-import com.glebgol.photospots.domain.client.ApiClient
 import com.glebgol.photospots.domain.data.Tag
 import com.glebgol.photospots.domain.data.TagDetails
-import com.glebgol.photospots.domain.location.LocationClient
-import com.glebgol.photospots.domain.osmdroid.OSMDroidMapController
 import com.glebgol.photospots.presenter.DefaultMainPresenter
 import com.glebgol.photospots.presenter.MainPresenter
 import org.osmdroid.config.Configuration
@@ -26,9 +18,6 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), MainView {
 
@@ -106,7 +95,7 @@ class MainActivity : AppCompatActivity(), MainView {
             marker.position = GeoPoint(tag.latitude, tag.longitude)
 
             marker.setOnMarkerClickListener { _, _ ->
-                mainPresenter.onMarkerClick(marker, tag)
+                mainPresenter.loadTagDetails(marker, tag)
                 true
             }
             map.overlays.add(marker)
@@ -162,7 +151,7 @@ class MainActivity : AppCompatActivity(), MainView {
         val marker = Marker(map)
         marker.position = GeoPoint(tag.latitude, tag.longitude)
         marker.setOnMarkerClickListener { _, _ ->
-            mainPresenter.onMarkerClick(marker, Tag(tag.id, tag.longitude, tag.latitude))
+            mainPresenter.loadTagDetails(marker, Tag(tag.id, tag.longitude, tag.latitude))
             true
         }
         map.overlays.add(marker)

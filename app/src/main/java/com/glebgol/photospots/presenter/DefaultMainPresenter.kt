@@ -3,7 +3,6 @@ package com.glebgol.photospots.presenter
 import android.content.Context
 import android.util.Log
 import com.glebgol.photospots.MainView
-import com.glebgol.photospots.TagDetailBottomSheetFragment
 import com.glebgol.photospots.domain.client.ApiClient
 import com.glebgol.photospots.domain.data.Tag
 import com.glebgol.photospots.domain.data.TagDetails
@@ -39,28 +38,6 @@ class DefaultMainPresenter(private val mainView: MainView, private val context: 
         })
     }
 
-    override fun loadTagDetails(tag: Tag) {
-        val call = ApiClient.tagApi.getTagById(tag.id)
-        call.enqueue(object : Callback<TagDetails> {
-            override fun onResponse(call: Call<TagDetails>, response: Response<TagDetails>) {
-                if (response.isSuccessful && response.body() != null) {
-                    val tagDetails = response.body()!!
-
-//                    mainView.showTagDetails()
-                } else {
-                    Log.w(
-                        "Error",
-                        "Error while getting tag details: ${response.code()} - ${response.message()}"
-                    )
-                }
-            }
-
-            override fun onFailure(call: Call<TagDetails>, t: Throwable) {
-                Log.e("Failure when getting tags", "Failure ${t.message}")
-            }
-        })
-    }
-
     override fun updateLocation() {
         locationClient = LocationClient(context)
         locationClient.startLocationUpdates()
@@ -75,7 +52,7 @@ class DefaultMainPresenter(private val mainView: MainView, private val context: 
         locationClient.stopLocationUpdates()
     }
 
-    override fun onMarkerClick(marker: Marker, tag: Tag) {
+    override fun loadTagDetails(marker: Marker, tag: Tag) {
         val call = ApiClient.tagApi.getTagById(tag.id)
         call.enqueue(object : Callback<TagDetails> {
             override fun onResponse(call: Call<TagDetails>, response: Response<TagDetails>) {
