@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import coil3.compose.AsyncImage
+import com.glebgol.photospots.presentation.TagsScreen
 import com.glebgol.photospots.ui.theme.PhotospotsTheme
 
 class MainActivity : ComponentActivity() {
