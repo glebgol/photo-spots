@@ -3,8 +3,9 @@ package com.glebgol.photospots.data
 import com.glebgol.photospots.domain.TagData
 import com.glebgol.photospots.domain.TagRepository
 import kotlinx.coroutines.delay
+import javax.inject.Inject
 
-class TagRepositoryImpl : TagRepository {
+class TagRepositoryImpl @Inject constructor() : TagRepository {
     override suspend fun getAllTags(): List<TagData> {
         delay(2000)
         return listOf(

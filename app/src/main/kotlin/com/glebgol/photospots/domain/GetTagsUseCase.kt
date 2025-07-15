@@ -1,6 +1,8 @@
 package com.glebgol.photospots.domain
 
-class GetTagsUseCase(private val tagRepository: TagRepository) {
+import javax.inject.Inject
+
+class GetTagsUseCase @Inject constructor(private val tagRepository: TagRepository) {
 
     suspend fun getTags(): List<TagData> {
         return tagRepository.getAllTags()

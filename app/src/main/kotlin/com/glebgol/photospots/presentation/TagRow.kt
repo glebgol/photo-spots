@@ -40,8 +40,8 @@ fun TagRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(R.drawable.ic_launcher_background),
+        AsyncImage(
+            model = tag.imageUrl,
             contentDescription = null,
             modifier = Modifier
                 .padding(5.dp)
