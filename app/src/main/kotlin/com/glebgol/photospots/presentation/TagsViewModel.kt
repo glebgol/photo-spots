@@ -14,23 +14,32 @@ import javax.inject.Inject
 @HiltViewModel
 class TagsViewModel @Inject constructor(
     private val getTagsUseCase: GetTagsUseCase
-): ViewModel() {
+) : ViewModel() {
 
     private val _state = MutableStateFlow(TagsState())
     val state = _state.asStateFlow()
 
     fun onIntent(intent: TagsIntent) {
-        when(intent) {
+        when (intent) {
             TagsIntent.LoadTagsIntent -> {
                 _state.update {
                     it.copy(isLoading = true)
                 }
                 viewModelScope.launch {
-                    _state.update {
-                        it.copy(tags = getTagsUseCase.getTags(), isLoading = false)
-                    }
+                    getTagsUseCase.getTags()
+                        .onFailure {
+                            _state.update {
+                                it.copy(isError = true)
+                            }
+                        }
+                        .onSuccess { tags ->
+                            _state.update {
+                                it.copy(tags = tags, isLoading = false, isError = false)
+                            }
+                        }
                 }
             }
         }
     }
 }
+
