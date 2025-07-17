@@ -1,11 +1,8 @@
 package com.glebgol.photospots.data
 
-import com.google.gson.annotations.SerializedName
-
-data class TagDto(
+data class TagDetailsDto(
     val id: String,
-    @SerializedName("imageUri")
-    val image: String,
+    val imageUri: String,
     val description: String,
     val longitude: Double,
     val latitude: Double

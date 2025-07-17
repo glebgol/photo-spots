@@ -1,5 +1,6 @@
 package com.glebgol.photospots.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -21,12 +22,16 @@ import com.glebgol.photospots.domain.TagData
 @Composable
 fun TagRow(
     modifier: Modifier = Modifier,
-    tag: TagData
+    tag: TagData,
+    onTagClick: (String) -> Unit
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(100.dp),
+            .height(100.dp)
+            .clickable {
+                onTagClick(tag.id)
+            },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -49,10 +54,12 @@ fun TagRow(
 private fun TagRowPreview() {
     TagRow(
         tag = TagData(
+            id = "1",
             imageUrl = "",
             description = "Minsk",
             latitude = 10.0,
             longitude = 12.0
-        )
+        ),
+        onTagClick = {}
     )
 }

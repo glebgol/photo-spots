@@ -19,15 +19,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.glebgol.photospots.data.TagDto
 import com.glebgol.photospots.data.mapToData
+import com.glebgol.photospots.domain.TagData
 
 @Composable
 fun TagsScreen(
     modifier: Modifier = Modifier,
-    viewModel: TagsViewModel = hiltViewModel<TagsViewModel>()
+    viewModel: TagsViewModel,
+    onTagClick: (String) -> Unit,
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(TagsIntent.LoadTagsIntent)
@@ -36,8 +39,8 @@ fun TagsScreen(
     TagsScreenContent(
         modifier = modifier,
         state = state,
-        onTagClick = {},
-        onError = { viewModel.onIntent(TagsIntent.LoadTagsIntent) }
+        onTagClick = onTagClick,
+        onError = { viewModel.onIntent(TagsIntent.LoadTagsIntent) },
     )
 }
 
@@ -46,7 +49,7 @@ fun TagsScreenContent(
     modifier: Modifier = Modifier,
     state: TagsState,
     onTagClick: (String) -> Unit,
-    onError: () -> Unit
+    onError: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -54,37 +57,57 @@ fun TagsScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when {
-            state.isError -> Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(onClick = onError) {
-                    Text(
-                        text = "Try again",
-                        fontSize = 20.sp
-                    )
-                }
-            }
-            state.isLoading -> Box(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Text(
-                    text = "Loading",
-                    fontSize = 20.sp
-                )
-            }
-            state.tags != null -> LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(10.dp)
-            ) {
+            state.isError -> ErrorState(onError)
+            state.isLoading -> LoadingState()
+            state.tags != null -> TagsList(state.tags, onTagClick)
+        }
+    }
+}
 
-                items(state.tags) { tag ->
-                    TagRow(
-                        tag = tag
-                    )
-                }
-            }
+@Composable
+private fun TagsList(
+    tags: List<TagData>,
+    onTagClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+    ) {
+
+        items(tags) { tag ->
+            TagRow(
+                tag = tag,
+                onTagClick = onTagClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun LoadingState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Text(
+            text = "Loading",
+            fontSize = 20.sp
+        )
+    }
+}
+
+@Composable
+private fun ErrorState(onError: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Button(onClick = onError) {
+            Text(
+                text = "Try again",
+                fontSize = 20.sp
+            )
         }
     }
 }
@@ -95,20 +118,22 @@ private fun TagsScreenPreview() {
     TagsScreenContent(
         modifier = Modifier,
         state = TagsState(
-            isError = true,
-            isLoading = true,
+            isError = false,
+            isLoading = false,
             tags = listOf(
                 TagDto(
                     image = "test.com",
                     description = "Hello world",
                     longitude = 14.5,
-                    latitude = 35.8
+                    latitude = 35.8,
+                    id = "1"
                 ),
                 TagDto(
                     image = "test.com",
                     description = "Hello guys",
                     longitude = 142.5,
-                    latitude = -35.8
+                    latitude = -35.8,
+                    id = "2"
                 )
             ).mapToData()
         ),

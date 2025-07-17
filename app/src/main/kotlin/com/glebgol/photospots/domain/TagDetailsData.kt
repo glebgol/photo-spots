@@ -1,6 +1,6 @@
 package com.glebgol.photospots.domain
 
-data class TagData(
+data class TagDetailsData(
     val id: String,
     val imageUrl: String,
     val description: String,

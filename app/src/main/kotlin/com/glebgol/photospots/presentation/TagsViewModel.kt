@@ -1,6 +1,5 @@
 package com.glebgol.photospots.presentation
 
-import android.nfc.Tag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.glebgol.photospots.domain.GetTagsUseCase
@@ -19,6 +18,11 @@ class TagsViewModel @Inject constructor(
     private val _state = MutableStateFlow(TagsState())
     val state = _state.asStateFlow()
 
+
+    init {
+        onIntent(TagsIntent.LoadTagsIntent)
+    }
+
     fun onIntent(intent: TagsIntent) {
         when (intent) {
             TagsIntent.LoadTagsIntent -> {
@@ -26,7 +30,7 @@ class TagsViewModel @Inject constructor(
                     it.copy(isLoading = true)
                 }
                 viewModelScope.launch {
-                    getTagsUseCase.getTags()
+                    getTagsUseCase.execute()
                         .onFailure {
                             _state.update {
                                 it.copy(isError = true)
@@ -42,4 +46,3 @@ class TagsViewModel @Inject constructor(
         }
     }
 }
-
