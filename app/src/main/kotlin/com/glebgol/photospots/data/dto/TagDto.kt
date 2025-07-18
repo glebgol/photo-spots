@@ -1,4 +1,4 @@
-package com.glebgol.photospots.data
+package com.glebgol.photospots.data.dto
 
 import com.google.gson.annotations.SerializedName
 

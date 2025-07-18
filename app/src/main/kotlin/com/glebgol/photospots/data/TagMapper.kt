@@ -1,5 +1,8 @@
 package com.glebgol.photospots.data
 
+import com.glebgol.photospots.data.dto.TagDetailsDto
+import com.glebgol.photospots.data.dto.TagDto
+import com.glebgol.photospots.data.room.dao.TagEntity
 import com.glebgol.photospots.domain.TagData
 import com.glebgol.photospots.domain.TagDetailsData
 
@@ -25,4 +28,22 @@ fun TagDetailsDto.mapToData(): TagDetailsData {
         longitude = longitude,
         latitude = latitude,
     )
+}
+
+fun TagEntity.toDto(): TagDto = TagDto(
+    id = id, image = imageUrl, description = description, longitude = longitude,
+    latitude = latitude
+)
+
+fun List<TagEntity>.toDto(): List<TagDto> {
+    return map { tag -> tag.toDto() }
+}
+
+fun TagDto.toEntity(): TagEntity = TagEntity(
+    id = id, imageUrl = image, description = description, longitude = longitude,
+    latitude = latitude
+)
+
+fun List<TagDto>.toEntities(): List<TagEntity> {
+    return map { tag -> tag.toEntity() }
 }

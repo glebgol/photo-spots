@@ -3,18 +3,26 @@ package com.glebgol.photospots.data
 import com.glebgol.photospots.domain.TagData
 import com.glebgol.photospots.domain.TagDetailsData
 import com.glebgol.photospots.domain.TagRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class TagRepositoryImpl @Inject constructor(
-    private val tagApi: TagApi
+    private val tagsLocalDataSource: TagsLocalDataSource,
+    private val tagsRemoteDataSource: TagsRemoteDataSource,
 ) : TagRepository {
     override suspend fun getAllTags(): List<TagData> {
-        return tagApi.getTags()
-            .mapToData()
+        return try {
+            tagsRemoteDataSource.getTags().also {
+                tagsLocalDataSource.saveRemoteResponse(it)
+            }.mapToData()
+        } catch (e: Exception) {
+            return tagsLocalDataSource.loadTags()
+                .mapToData()
+        }
     }
 
     override suspend fun getTagDetails(tagId: String): TagDetailsData {
-        return tagApi.getTagDetails(id = tagId)
+        return tagsRemoteDataSource.getTagDetails(id = tagId)
             .mapToData()
     }
 }

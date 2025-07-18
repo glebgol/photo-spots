@@ -1,4 +1,4 @@
-package com.glebgol.photospots.data
+package com.glebgol.photospots.data.dto
 
 data class TagDetailsDto(
     val id: String,
