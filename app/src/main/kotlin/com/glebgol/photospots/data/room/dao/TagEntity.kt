@@ -21,7 +21,7 @@ data class TagEntity(
     val longitude: Double,
     val latitude: Double,
     @ColumnInfo(name = "isFavourite", defaultValue = "0")
-    val isFavourite: Boolean
+    val isFavourite: Int
 ) {
     companion object {
         const val TABLE_NAME = "tags"

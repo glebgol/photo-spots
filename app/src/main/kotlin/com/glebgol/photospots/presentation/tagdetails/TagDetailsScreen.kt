@@ -39,7 +39,7 @@ fun TagDetailsScreen(
         state = state,
         onLikeClick = {
             viewModel.onIntent(
-                TagDetailsIntent.ToggleLikeIntent(state.tagDetails!!.id)
+                TagDetailsIntent.ToggleLikeIntent(state.tagDetails!!.id, !state.isFavourite)
             )
         },
         onBackClick = onBackClick
@@ -50,7 +50,7 @@ fun TagDetailsScreen(
 private fun TagDetailsContent(
     modifier: Modifier = Modifier,
     state: TagDetailsState,
-    onLikeClick: (String) -> Unit,
+    onLikeClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
     Column(
@@ -74,6 +74,13 @@ private fun TagDetailsContent(
                     .fillMaxWidth(),
                 contentScale = ContentScale.FillWidth
             )
+            HeartButton(
+                onClick = onLikeClick,
+                isFavourite = state.isFavourite
+            )
+            Button(onClick = onLikeClick) {
+                Text(text = "${state.isFavourite}")
+            }
             Text(text = tag.description)
             Text(text = "Coordinates ${tag.latitude} ${tag.longitude}")
         }
@@ -91,6 +98,7 @@ private fun TagDetailsContentPreview() {
                 description = "Description",
                 longitude = 10.0,
                 latitude = -10.0,
+                isFavourite = false,
             ),
             isLoading = false,
             isError = false

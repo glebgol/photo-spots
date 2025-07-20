@@ -28,13 +28,14 @@ fun TagDetailsDto.mapToData(): TagDetailsData {
         description = description,
         longitude = longitude,
         latitude = latitude,
+        isFavourite = isFavourite,
     )
 }
 
 fun TagEntity.toDto(): TagDto = TagDto(
     id = id, image = imageUrl, description = description, longitude = longitude,
     latitude = latitude,
-    isFavourite = isFavourite
+    isFavourite = isFavourite == 1
 )
 
 fun List<TagEntity>.toDto(): List<TagDto> {
@@ -43,7 +44,7 @@ fun List<TagEntity>.toDto(): List<TagDto> {
 
 fun TagDto.toEntity(): TagEntity = TagEntity(
     id = id, imageUrl = image, description = description, longitude = longitude,
-    latitude = latitude, isFavourite = isFavourite
+    latitude = latitude, isFavourite = if (isFavourite) 1 else 0
 )
 
 fun List<TagDto>.toEntities(): List<TagEntity> {

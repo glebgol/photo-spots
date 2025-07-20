@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,10 +28,6 @@ fun TagsScreen(
     onTagClick: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.onIntent(TagsIntent.LoadTagsIntent)
-    }
 
     TagsScreenContent(
         modifier = modifier,
@@ -69,15 +64,15 @@ private fun TagsList(
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(10.dp)
     ) {
 
-        items(tags) { tag ->
+        items(tags, key = { it.id }) { tag ->
             TagRow(
                 tag = tag,
-                onTagClick = onTagClick
+                onTagClick = onTagClick,
             )
         }
     }
@@ -124,14 +119,16 @@ private fun TagsScreenPreview() {
                     description = "Hello world",
                     longitude = 14.5,
                     latitude = 35.8,
-                    id = "1"
+                    id = "1",
+                    isFavourite = false
                 ),
                 TagDto(
                     image = "test.com",
                     description = "Hello guys",
                     longitude = 142.5,
                     latitude = -35.8,
-                    id = "2"
+                    id = "2",
+                    isFavourite = false
                 )
             ).mapToData()
         ),

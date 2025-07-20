@@ -1,11 +1,13 @@
 package com.glebgol.photospots.presentation.tagdetails
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.glebgol.photospots.domain.TagRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,23 +19,39 @@ class TagDetailsViewModel @Inject constructor(
     private val _state = MutableStateFlow(TagDetailsState())
     val state = _state.asStateFlow()
 
+    init {
+        Log.d("ViewModel", "DetailViewModel created")
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("ViewModel", "DetailViewModel cleared")
+    }
+
     fun onIntent(intent: TagDetailsIntent) {
         when (intent) {
             is TagDetailsIntent.LoadTagDetailsIntent -> {
-                _state.update {
-                    it.copy(isLoading = true)
-                }
                 viewModelScope.launch {
+                    _state.update {
+                        it.copy(isLoading = true)
+                    }
+                    val tagDetails = tagsRepository.getTagDetails(intent.tagId)
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            tagDetails = tagsRepository.getTagDetails(intent.tagId)
+                            tagDetails = tagDetails,
+                            isFavourite = tagDetails.isFavourite
                         )
                     }
                 }
             }
             is TagDetailsIntent.ToggleLikeIntent -> {
-
+                viewModelScope.launch {
+                    tagsRepository.updateTag(tagId = intent.id, isFavourite = intent.isFavourite)
+                    _state.update {
+                        it.copy(isFavourite = intent.isFavourite)
+                    }
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.glebgol.photospots
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -45,16 +46,19 @@ class MainActivity : ComponentActivity() {
                                 TagsScreen(
                                     viewModel = viewModel,
                                     modifier = Modifier.padding(innerPadding),
-                                    onTagClick = { navController.navigate(Route.TagDetailsRoute(it)) }
+                                    onTagClick = {
+                                        navController.navigate(Route.TagDetailsRoute(it))
+                                    }
                                 )
                             }
-                            composable<Route.TagDetailsRoute> {
-                                val args = it.toRoute<Route.TagDetailsRoute>()
-                                val viewModel = hiltViewModel<TagDetailsViewModel>()
+                            composable<Route.TagDetailsRoute> { entry ->
+                                val args = entry.toRoute<Route.TagDetailsRoute>()
                                 TagDetailsScreen(
                                     id = args.id,
-                                    viewModel = viewModel,
-                                    onBackClick = { navController.popBackStack() }
+                                    viewModel = hiltViewModel<TagDetailsViewModel>(),
+                                    onBackClick = {
+                                        navController.navigateUp()
+                                    }
                                 )
                             }
                         }

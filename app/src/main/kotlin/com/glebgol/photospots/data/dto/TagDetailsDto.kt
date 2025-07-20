@@ -5,5 +5,6 @@ data class TagDetailsDto(
     val imageUri: String,
     val description: String,
     val longitude: Double,
-    val latitude: Double
+    val latitude: Double,
+    val isFavourite: Boolean
 )

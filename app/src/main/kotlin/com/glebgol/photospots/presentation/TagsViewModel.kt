@@ -1,5 +1,6 @@
 package com.glebgol.photospots.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.glebgol.photospots.domain.GetTagsUseCase
@@ -18,31 +19,35 @@ class TagsViewModel @Inject constructor(
     private val _state = MutableStateFlow(TagsState())
     val state = _state.asStateFlow()
 
-
     init {
-        onIntent(TagsIntent.LoadTagsIntent)
+        Log.d("ViewModel", "List created")
+        loadTags()
     }
 
     fun onIntent(intent: TagsIntent) {
         when (intent) {
             TagsIntent.LoadTagsIntent -> {
-                _state.update {
-                    it.copy(isLoading = true)
-                }
-                viewModelScope.launch {
-                    getTagsUseCase.execute()
-                        .onFailure {
-                            _state.update {
-                                it.copy(isError = true)
-                            }
-                        }
-                        .onSuccess { tags ->
-                            _state.update {
-                                it.copy(tags = tags, isLoading = false, isError = false)
-                            }
-                        }
-                }
+                loadTags()
             }
+        }
+    }
+
+    private fun loadTags() {
+        _state.update {
+            it.copy(isLoading = true)
+        }
+        viewModelScope.launch {
+            getTagsUseCase.execute()
+                .onFailure {
+                    _state.update {
+                        it.copy(isError = true)
+                    }
+                }
+                .onSuccess { tags ->
+                    _state.update {
+                        it.copy(tags = tags, isLoading = false, isError = false)
+                    }
+                }
         }
     }
 }
