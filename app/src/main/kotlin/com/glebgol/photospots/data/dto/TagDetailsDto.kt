@@ -1,8 +1,8 @@
-package com.glebgol.photospots.domain
+package com.glebgol.photospots.data.dto
 
-data class TagData(
+data class TagDetailsDto(
     val id: String,
-    val imageUrl: String,
+    val imageUri: String,
     val description: String,
     val longitude: Double,
     val latitude: Double,

@@ -1,4 +1,4 @@
-package com.glebgol.photospots.ui.theme
+package com.glebgol.photospots.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

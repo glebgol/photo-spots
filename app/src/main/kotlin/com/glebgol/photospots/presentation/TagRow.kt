@@ -1,5 +1,6 @@
 package com.glebgol.photospots.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,12 +23,16 @@ import com.glebgol.photospots.domain.TagData
 @Composable
 fun TagRow(
     modifier: Modifier = Modifier,
-    tag: TagData
+    tag: TagData,
+    onTagClick: (String) -> Unit,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(100.dp),
+            .height(100.dp)
+            .clickable {
+                onTagClick(tag.id)
+            },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -40,7 +46,8 @@ fun TagRow(
                 .clip(CircleShape),
         )
         Text(text = tag.description)
-        Text(text = "${tag.latitude} ${tag.longitude}")
+
+        Text(text = "${tag.isFavourite} ${tag.latitude} ${tag.longitude}")
     }
 }
 
@@ -49,10 +56,13 @@ fun TagRow(
 private fun TagRowPreview() {
     TagRow(
         tag = TagData(
+            id = "1",
             imageUrl = "",
             description = "Minsk",
             latitude = 10.0,
-            longitude = 12.0
-        )
+            longitude = 12.0,
+            isFavourite = false
+        ),
+        onTagClick = {},
     )
 }

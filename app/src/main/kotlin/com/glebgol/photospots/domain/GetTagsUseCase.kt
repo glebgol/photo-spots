@@ -1,10 +1,11 @@
 package com.glebgol.photospots.domain
 
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetTagsUseCase @Inject constructor(private val tagRepository: TagRepository) {
 
-    suspend fun getTags(): Result<List<TagData>> {
+    suspend fun execute(): Result<List<TagData>> {
         try {
             return Result.success(tagRepository.getAllTags())
         } catch (e: Exception) {
@@ -12,7 +13,7 @@ class GetTagsUseCase @Inject constructor(private val tagRepository: TagRepositor
         }
     }
 
-    suspend fun getTagsByQuery(query: String): List<TagData> {
-        return tagRepository.getAllTags()
+    fun getFavouritesTags(): Flow<List<TagData>> {
+        return tagRepository.getFavoriteTags()
     }
 }

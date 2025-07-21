@@ -1,4 +1,4 @@
-package com.glebgol.photospots.ui.theme
+package com.glebgol.photospots.presentation.theme
 
 import android.app.Activity
 import android.os.Build
