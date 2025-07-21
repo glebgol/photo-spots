@@ -6,6 +6,8 @@ import com.glebgol.photospots.data.room.dao.TagsDao
 import com.glebgol.photospots.data.toDto
 import com.glebgol.photospots.data.toEntities
 import com.glebgol.photospots.data.toEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class RoomTagsLocalDataSource @Inject constructor(
@@ -35,6 +37,11 @@ class RoomTagsLocalDataSource @Inject constructor(
     override suspend fun getTagById(id: String): TagDto {
         return tagsDao.selectTagById(tagId = id)
             .toDto()
+    }
+
+    override fun getFavoriteTags(): Flow<List<TagDto>> {
+        return tagsDao.selectFavouriteTags()
+            .map { it.toDto() }
     }
 
     override suspend fun updateTag(id: String, isFavourite: Boolean) {

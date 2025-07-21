@@ -35,14 +35,21 @@ class TagDetailsViewModel @Inject constructor(
                     _state.update {
                         it.copy(isLoading = true)
                     }
-                    val tagDetails = tagsRepository.getTagDetails(intent.tagId)
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            tagDetails = tagDetails,
-                            isFavourite = tagDetails.isFavourite
-                        )
-                    }
+                    tagsRepository.getTagDetails(intent.tagId)
+                        .onSuccess { tagDetails ->
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    tagDetails = tagDetails,
+                                    isFavourite = tagDetails.isFavourite
+                                )
+                            }
+                        }
+                        .onFailure {
+                            _state.update {
+                                it.copy(isError = true, isLoading = false)
+                            }
+                        }
                 }
             }
             is TagDetailsIntent.ToggleLikeIntent -> {

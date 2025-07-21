@@ -1,5 +1,6 @@
 package com.glebgol.photospots.domain
 
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetTagsUseCase @Inject constructor(private val tagRepository: TagRepository) {
@@ -10,5 +11,9 @@ class GetTagsUseCase @Inject constructor(private val tagRepository: TagRepositor
         } catch (e: Exception) {
             return Result.failure(e)
         }
+    }
+
+    fun getFavouritesTags(): Flow<List<TagData>> {
+        return tagRepository.getFavoriteTags()
     }
 }

@@ -3,6 +3,8 @@ package com.glebgol.photospots.data
 import com.glebgol.photospots.domain.TagData
 import com.glebgol.photospots.domain.TagDetailsData
 import com.glebgol.photospots.domain.TagRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class TagRepositoryImpl @Inject constructor(
@@ -21,14 +23,28 @@ class TagRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTagDetails(tagId: String): TagDetailsData {
-        val remoteDetails = tagsRemoteDataSource.getTagDetails(id = tagId)
+    override suspend fun getTagsByQuery(query: String): List<TagData> {
+        return tagsRemoteDataSource.getTagsByQuery(query = query)
             .mapToData()
+    }
 
-        return remoteDetails.copy(
-            isFavourite = tagsLocalDataSource.getTagById(id = tagId)
-                .isFavourite
-        )
+    override suspend fun getTagDetails(tagId: String): Result<TagDetailsData> {
+        try {
+            val remoteDetails = tagsRemoteDataSource.getTagDetails(id = tagId)
+                .mapToData()
+
+            return Result.success(remoteDetails.copy(
+                isFavourite = tagsLocalDataSource.getTagById(id = tagId)
+                    .isFavourite
+            ))
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
+
+    override fun getFavoriteTags(): Flow<List<TagData>> {
+        return tagsLocalDataSource.getFavoriteTags()
+            .map { it.mapToData() }
     }
 
     override suspend fun updateTag(tagId: String, isFavourite: Boolean) {

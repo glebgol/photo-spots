@@ -3,6 +3,7 @@ package com.glebgol.photospots.data.room.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TagsDao {
@@ -15,6 +16,9 @@ interface TagsDao {
 
     @Query("SELECT * FROM ${TagEntity.TABLE_NAME} WHERE id = :tagId")
     suspend fun selectTagById(tagId: String): TagEntity
+
+    @Query("SELECT * FROM ${TagEntity.TABLE_NAME} WHERE isFavourite = 1")
+    fun selectFavouriteTags(): Flow<List<TagEntity>>
 
     @Query("UPDATE ${TagEntity.TABLE_NAME} SET isFavourite = :isFavourite WHERE id=:id")
     suspend fun updateTag(id: String, isFavourite: Int)

@@ -64,6 +64,7 @@ private fun TagDetailsContent(
         Button(onClick = onBackClick, modifier = Modifier.size(100.dp)) {
             Text(text = "Back")
         }
+        Text(text = "Something went wrong")
         val tag = state.tagDetails
         if (tag != null) {
             AsyncImage(

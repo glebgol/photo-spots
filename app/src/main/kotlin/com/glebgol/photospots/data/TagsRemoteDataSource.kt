@@ -6,4 +6,5 @@ import com.glebgol.photospots.data.dto.TagDto
 interface TagsRemoteDataSource {
     suspend fun getTags(): List<TagDto>
     suspend fun getTagDetails(id: String): TagDetailsDto
+    suspend fun getTagsByQuery(query: String): List<TagDto>
 }
