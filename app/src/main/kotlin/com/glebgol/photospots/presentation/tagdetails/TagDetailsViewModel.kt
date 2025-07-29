@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.glebgol.photospots.domain.TagRepository
+import com.glebgol.photospots.presentation.AndroidMapNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TagDetailsViewModel @Inject constructor(
-    private val tagsRepository: TagRepository
+    private val tagsRepository: TagRepository,
+    private val mapNavigator: AndroidMapNavigator
 ): ViewModel() {
     private val _state = MutableStateFlow(TagDetailsState())
     val state = _state.asStateFlow()
@@ -59,6 +61,10 @@ class TagDetailsViewModel @Inject constructor(
                         it.copy(isFavourite = intent.isFavourite)
                     }
                 }
+            }
+
+            is TagDetailsIntent.OpenTagOnMap -> {
+                mapNavigator.openMap(latitude = intent.latitude, longitude = intent.longitude)
             }
         }
     }
