@@ -42,7 +42,15 @@ fun TagDetailsScreen(
                 TagDetailsIntent.ToggleLikeIntent(state.tagDetails!!.id, !state.isFavourite)
             )
         },
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        openOnMap = {
+            val tagDetails = state.tagDetails
+            if (tagDetails != null) {
+                viewModel.onIntent(
+                    TagDetailsIntent.OpenTagOnMap(tagDetails.latitude, tagDetails.longitude)
+                )
+            }
+        }
     )
 }
 
@@ -51,7 +59,8 @@ private fun TagDetailsContent(
     modifier: Modifier = Modifier,
     state: TagDetailsState,
     onLikeClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    openOnMap: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -82,6 +91,10 @@ private fun TagDetailsContent(
             Button(onClick = onLikeClick) {
                 Text(text = "${state.isFavourite}")
             }
+            MapButton(
+                onClick = openOnMap,
+                modifier = Modifier.fillMaxWidth()
+            )
             Text(text = tag.description)
             Text(text = "Coordinates ${tag.latitude} ${tag.longitude}")
         }
@@ -105,6 +118,7 @@ private fun TagDetailsContentPreview() {
             isError = false
         ),
         onLikeClick = {},
-        onBackClick = { }
+        onBackClick = { },
+        openOnMap = {}
     )
 }
