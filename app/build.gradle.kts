@@ -31,13 +31,31 @@ android {
         }
     }
 
+    val localApiUrl = "http://localhost:8080/"
+    val uatApiUrl = "http://uat.api/"
+    val prodApiUrl = "http://prod.api/"
+
     buildTypes {
+        debug {
+            buildConfigField("String", "API_URL", "\"$localApiUrl\"")
+        }
+
+        create("uat") {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("String", "API_URL", "\"$uatApiUrl\"")
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "API_URL", "\"$prodApiUrl\"")
         }
     }
     compileOptions {
@@ -49,6 +67,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
