@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Photospots</string>
+    <string name="permission_required">Camera required</string>
 </resources>
