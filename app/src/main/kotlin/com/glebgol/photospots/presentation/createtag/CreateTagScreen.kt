@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,6 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -99,9 +102,20 @@ fun CreateTagScreen(
         ) {
             when {
                 state.isCameraOpen -> CameraScreen(controller, viewModel)
+                state.isLoading -> LoadingScreen()
                 else -> TagCreationScreen(bitmap, state, viewModel)
             }
         }
+    }
+}
+
+@Composable
+fun LoadingScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
     }
 }
 
@@ -112,6 +126,8 @@ private fun TagCreationScreen(
     viewModel: CreateTagViewModel
 ) {
     val scrollState = rememberScrollState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
@@ -150,7 +166,11 @@ private fun TagCreationScreen(
         Button(
             modifier = Modifier
                 .fillMaxWidth(),
-            onClick = { viewModel.onIntent(CreateTagIntent.OnCreate) }
+            onClick = {
+                focusManager.clearFocus()
+                keyboardController?.hide()
+                viewModel.onIntent(CreateTagIntent.OnCreate)
+            }
         ) {
             Text(text = "Create")
         }

@@ -95,6 +95,9 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
 
+    implementation(libs.play.services.location)
+    implementation(libs.jetbrains.kotlinx.coroutines.play.services)
+
     implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.androidx.core.ktx)
