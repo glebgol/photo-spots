@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,6 +33,14 @@ import kotlinx.serialization.Serializable
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ),
+            1
+        )
         enableEdgeToEdge()
         setContent {
             PhotospotsTheme {
@@ -47,7 +56,8 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable<Route.TagsListRoute> {
                                 val cameraPermissionLauncher = requestCameraLauncher {
-                                    navController.navigate(Route.Create) }
+                                    navController.navigate(Route.Create)
+                                }
                                 TagsScreen(
                                     viewModel = hiltViewModel<TagsViewModel>(),
                                     modifier = Modifier.padding(innerPadding),
