@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,8 +48,10 @@ fun TagRow(
                 .clip(CircleShape),
         )
         Text(text = tag.description)
-
-        Text(text = "${tag.isFavourite} ${tag.latitude} ${tag.longitude}")
+        Icon(
+            imageVector = Icons.Default.LocationOn,
+            contentDescription = null
+        )
     }
 }
 
