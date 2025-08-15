@@ -1,6 +1,6 @@
-package com.glebgol.photospots.presentation
+package com.glebgol.photospots.presentation.taglist
 
-import com.glebgol.photospots.domain.TagData
+import com.glebgol.photospots.domain.data.TagData
 
 data class TagsState(
     val isLoading: Boolean = true,

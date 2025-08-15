@@ -1,7 +1,8 @@
 package com.glebgol.photospots.data
 
-import com.glebgol.photospots.domain.TagData
-import com.glebgol.photospots.domain.TagDetailsData
+import com.glebgol.photospots.domain.data.CreateTagData
+import com.glebgol.photospots.domain.data.TagData
+import com.glebgol.photospots.domain.data.TagDetailsData
 import com.glebgol.photospots.domain.TagRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -26,6 +27,14 @@ class TagRepositoryImpl @Inject constructor(
     override suspend fun getTagsByQuery(query: String): List<TagData> {
         return tagsRemoteDataSource.getTagsByQuery(query = query)
             .mapToData()
+    }
+
+    override suspend fun createTag(tagData: CreateTagData): Result<TagDetailsData> {
+        try {
+            return Result.success(tagsRemoteDataSource.createTag(tagData).mapToData())
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
     }
 
     override suspend fun getTagDetails(tagId: String): Result<TagDetailsData> {

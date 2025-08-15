@@ -1,10 +1,10 @@
-package com.glebgol.photospots.presentation
+package com.glebgol.photospots.presentation.taglist
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.glebgol.photospots.domain.GetTagsUseCase
-import com.glebgol.photospots.domain.TagRepository
+import com.glebgol.photospots.domain.usecases.GetTagsUseCase
+import com.glebgol.photospots.domain.usecases.GetFavouriteTagsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TagsViewModel @Inject constructor(
     private val getTagsUseCase: GetTagsUseCase,
-    private val tagsRepository: TagRepository
+    private val getFavouriteTagsUseCase: GetFavouriteTagsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TagsState())
@@ -66,24 +66,29 @@ class TagsViewModel @Inject constructor(
             _state.update {
                 it.copy(isLoading = true)
             }
-            _state.update {
-                it.copy(
-                    searchResultTags = tagsRepository.getTagsByQuery(query = query),
-                    isLoading = false
-                )
-            }
+            getTagsUseCase.execute(query = query)
+                .onSuccess { tags ->
+                    _state.update {
+                        it.copy(
+                            searchResultTags = tags,
+                            isLoading = false
+                        )
+                    }
+                }
         }
     }
 
     private var searchJob: Job? = null
 
     private fun observeFavoriteTags() {
-        getTagsUseCase.getFavouritesTags()
-            .onEach { tags ->
-                _state.update {
-                    it.copy(favoriteTags = tags)
-                }
-            }.launchIn(viewModelScope)
+        getFavouriteTagsUseCase.execute()
+            .onSuccess { tagsFlow ->
+                tagsFlow.onEach { tags ->
+                    _state.update {
+                        it.copy(favoriteTags = tags)
+                    }
+                }.launchIn(viewModelScope)
+            }
     }
 
     fun onIntent(intent: TagsIntent) {

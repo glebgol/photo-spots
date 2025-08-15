@@ -1,6 +1,8 @@
-package com.glebgol.photospots.di
+package com.glebgol.photospots.app.di
 
 import android.content.Context
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,6 +12,11 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 object AndroidModule {
+
     @Provides
     fun provideContext(@ApplicationContext context: Context) = context
+
+    @Provides
+    fun provideFusedLocationClient(context: Context): FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(context)
 }
