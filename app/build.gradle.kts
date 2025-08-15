@@ -97,7 +97,7 @@ dependencies {
 
     implementation(libs.play.services.location)
     implementation(libs.jetbrains.kotlinx.coroutines.play.services)
-
+    implementation(libs.osmdroid.android)
     implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.androidx.core.ktx)

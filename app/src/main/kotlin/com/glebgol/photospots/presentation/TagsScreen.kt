@@ -33,11 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,14 +49,12 @@ fun TagsScreen(
     modifier: Modifier = Modifier,
     viewModel: TagsViewModel,
     onTagClick: (String) -> Unit,
-    onTagCreateClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     TagsListScreen(
         state = state,
         onTagClick = onTagClick,
-        onTagCreateClick = onTagCreateClick,
         onAction = viewModel::onIntent
     )
 }
@@ -70,7 +63,6 @@ fun TagsScreen(
 fun TagsListScreen(
     state: TagsState,
     onTagClick: (String) -> Unit,
-    onTagCreateClick: () -> Unit,
     onAction: (TagsIntent) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -91,172 +83,164 @@ fun TagsListScreen(
         onAction(TagsIntent.OnTabSelected(pagerState.currentPage))
     }
 
-    Scaffold(floatingActionButton = { FloatingActionButton(onClick = onTagCreateClick) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = null
-        )
-    } }) { padding ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(DarkBlue),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        BookSearchBar(
+            searchQuery = state.searchQuery,
+            onSearchQueryChange = {
+                onAction(TagsIntent.OnSearchQueryChange(it))
+            },
+            onImeSearch = {
+                keyboardController?.hide()
+            },
             modifier = Modifier
-                .fillMaxSize()
-                .background(DarkBlue)
-                .statusBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .widthIn(max = 400.dp)
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+        Surface(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            color = DesertWhite,
+            shape = RoundedCornerShape(
+                topStart = 32.dp,
+                topEnd = 32.dp
+            ),
         ) {
-            BookSearchBar(
-                searchQuery = state.searchQuery,
-                onSearchQueryChange = {
-                    onAction(TagsIntent.OnSearchQueryChange(it))
-                },
-                onImeSearch = {
-                    keyboardController?.hide()
-                },
-                modifier = Modifier
-                    .widthIn(max = 400.dp)
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
-            Surface(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                color = DesertWhite,
-                shape = RoundedCornerShape(
-                    topStart = 32.dp,
-                    topEnd = 32.dp
-                ),
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    TabRow(
-                        selectedTabIndex = state.selectedTabIndex,
-                        modifier = Modifier
-                            .padding(vertical = 12.dp)
-                            .widthIn(max = 700.dp)
-                            .fillMaxWidth(),
-                        containerColor = DesertWhite,
-                        indicator = { tabPositions ->
-                            TabRowDefaults.SecondaryIndicator(
-                                color = SandYellow,
-                                modifier = Modifier
-                                    .tabIndicatorOffset(tabPositions[state.selectedTabIndex])
-                            )
-                        }
-                    ) {
-                        Tab(
-                            selected = state.selectedTabIndex == 0,
-                            onClick = {
-                                onAction(TagsIntent.OnTabSelected(0))
-                            },
-                            modifier = Modifier.weight(1f),
-                            selectedContentColor = SandYellow,
-                            unselectedContentColor = Color.Black.copy(alpha = 0.5f)
-                        ) {
-                            Text(
-                                text = "Search results",
-                                modifier = Modifier
-                                    .padding(vertical = 12.dp)
-                            )
-                        }
-                        Tab(
-                            selected = state.selectedTabIndex == 1,
-                            onClick = {
-                                onAction(TagsIntent.OnTabSelected(1))
-                            },
-                            modifier = Modifier.weight(1f),
-                            selectedContentColor = SandYellow,
-                            unselectedContentColor = Color.Black.copy(alpha = 0.5f)
-                        ) {
-                            Text(
-                                text = "Favourites",
-                                modifier = Modifier
-                                    .padding(vertical = 12.dp)
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) { pageIndex ->
-                        Box(
+                TabRow(
+                    selectedTabIndex = state.selectedTabIndex,
+                    modifier = Modifier
+                        .padding(vertical = 12.dp)
+                        .widthIn(max = 700.dp)
+                        .fillMaxWidth(),
+                    containerColor = DesertWhite,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.SecondaryIndicator(
+                            color = SandYellow,
                             modifier = Modifier
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            when (pageIndex) {
-                                0 -> {
-                                    if (state.isLoading) {
-                                        CircularProgressIndicator()
-                                    } else {
-                                        when {
-                                            state.errorMessage != null -> {
-                                                Text(
-                                                    text = state.errorMessage,
-                                                    textAlign = TextAlign.Center,
-                                                    style = MaterialTheme.typography.headlineSmall,
-                                                    color = MaterialTheme.colorScheme.error
-                                                )
-                                            }
+                                .tabIndicatorOffset(tabPositions[state.selectedTabIndex])
+                        )
+                    }
+                ) {
+                    Tab(
+                        selected = state.selectedTabIndex == 0,
+                        onClick = {
+                            onAction(TagsIntent.OnTabSelected(0))
+                        },
+                        modifier = Modifier.weight(1f),
+                        selectedContentColor = SandYellow,
+                        unselectedContentColor = Color.Black.copy(alpha = 0.5f)
+                    ) {
+                        Text(
+                            text = "Search results",
+                            modifier = Modifier
+                                .padding(vertical = 12.dp)
+                        )
+                    }
+                    Tab(
+                        selected = state.selectedTabIndex == 1,
+                        onClick = {
+                            onAction(TagsIntent.OnTabSelected(1))
+                        },
+                        modifier = Modifier.weight(1f),
+                        selectedContentColor = SandYellow,
+                        unselectedContentColor = Color.Black.copy(alpha = 0.5f)
+                    ) {
+                        Text(
+                            text = "Favourites",
+                            modifier = Modifier
+                                .padding(vertical = 12.dp)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) { pageIndex ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        when (pageIndex) {
+                            0 -> {
+                                if (state.isLoading) {
+                                    CircularProgressIndicator()
+                                } else {
+                                    when {
+                                        state.errorMessage != null -> {
+                                            Text(
+                                                text = state.errorMessage,
+                                                textAlign = TextAlign.Center,
+                                                style = MaterialTheme.typography.headlineSmall,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
 
-                                            state.searchQuery.isNotEmpty() && state.searchResultTags.isEmpty() -> {
-                                                Text(
-                                                    text = "no tags by search query ${state.searchQuery}",
-                                                    textAlign = TextAlign.Center,
-                                                    style = MaterialTheme.typography.headlineSmall,
-                                                    color = MaterialTheme.colorScheme.error
-                                                )
-                                            }
+                                        state.searchQuery.isNotEmpty() && state.searchResultTags.isEmpty() -> {
+                                            Text(
+                                                text = "no tags by search query ${state.searchQuery}",
+                                                textAlign = TextAlign.Center,
+                                                style = MaterialTheme.typography.headlineSmall,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
 
-                                            state.searchQuery.isNotEmpty() && state.searchResultTags.isNotEmpty() -> {
-                                                TagsList1(
-                                                    tags = state.searchResultTags,
-                                                    onTagClick = onTagClick,
-                                                    modifier = Modifier.fillMaxSize(),
-                                                    scrollState = searchResultsListState
-                                                )
-                                            }
+                                        state.searchQuery.isNotEmpty() && state.searchResultTags.isNotEmpty() -> {
+                                            TagsList1(
+                                                tags = state.searchResultTags,
+                                                onTagClick = onTagClick,
+                                                modifier = Modifier.fillMaxSize(),
+                                                scrollState = searchResultsListState
+                                            )
+                                        }
 
-                                            state.tags.isEmpty() -> {
-                                                Text(
-                                                    text = "no tags",
-                                                    textAlign = TextAlign.Center,
-                                                    style = MaterialTheme.typography.headlineSmall,
-                                                    color = MaterialTheme.colorScheme.error
-                                                )
-                                            }
+                                        state.tags.isEmpty() -> {
+                                            Text(
+                                                text = "no tags",
+                                                textAlign = TextAlign.Center,
+                                                style = MaterialTheme.typography.headlineSmall,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
 
-                                            else -> {
-                                                TagsList1(
-                                                    tags = state.tags,
-                                                    onTagClick = onTagClick,
-                                                    modifier = Modifier.fillMaxSize(),
-                                                    scrollState = searchResultsListState
-                                                )
-                                            }
+                                        else -> {
+                                            TagsList1(
+                                                tags = state.tags,
+                                                onTagClick = onTagClick,
+                                                modifier = Modifier.fillMaxSize(),
+                                                scrollState = searchResultsListState
+                                            )
                                         }
                                     }
                                 }
+                            }
 
-                                1 -> {
-                                    if (state.favoriteTags.isEmpty()) {
-                                        Text(
-                                            text = "Favourite tags",
-                                            textAlign = TextAlign.Center,
-                                            style = MaterialTheme.typography.headlineSmall,
-                                        )
-                                    } else {
-                                        TagsList1(
-                                            tags = state.favoriteTags,
-                                            onTagClick = onTagClick,
-                                            modifier = Modifier.fillMaxSize(),
-                                            scrollState = favoriteBooksListState
-                                        )
-                                    }
+                            1 -> {
+                                if (state.favoriteTags.isEmpty()) {
+                                    Text(
+                                        text = "Favourite tags",
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.headlineSmall,
+                                    )
+                                } else {
+                                    TagsList1(
+                                        tags = state.favoriteTags,
+                                        onTagClick = onTagClick,
+                                        modifier = Modifier.fillMaxSize(),
+                                        scrollState = favoriteBooksListState
+                                    )
                                 }
                             }
                         }
@@ -324,6 +308,5 @@ private fun TagsScreenPreview() {
         ),
         onTagClick = {},
         onAction = { },
-        onTagCreateClick = { },
     )
 }
