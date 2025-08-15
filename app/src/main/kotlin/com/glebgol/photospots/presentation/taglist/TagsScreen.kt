@@ -1,4 +1,4 @@
-package com.glebgol.photospots.presentation
+package com.glebgol.photospots.presentation.taglist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -39,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.glebgol.photospots.data.dto.TagDto
 import com.glebgol.photospots.data.mapToData
-import com.glebgol.photospots.domain.TagData
+import com.glebgol.photospots.domain.data.TagData
 import com.glebgol.photospots.presentation.theme.DarkBlue
 import com.glebgol.photospots.presentation.theme.DesertWhite
 import com.glebgol.photospots.presentation.theme.SandYellow

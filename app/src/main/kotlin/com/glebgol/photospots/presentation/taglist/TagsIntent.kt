@@ -1,4 +1,4 @@
-package com.glebgol.photospots.presentation
+package com.glebgol.photospots.presentation.taglist
 
 sealed class TagsIntent {
 

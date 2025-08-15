@@ -1,4 +1,4 @@
-package com.glebgol.photospots.presentation
+package com.glebgol.photospots.presentation.taglist
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background

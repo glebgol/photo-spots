@@ -1,6 +1,7 @@
-package com.glebgol.photospots.data
+package com.glebgol.photospots.app.di
 
 import com.glebgol.photospots.BuildConfig
+import com.glebgol.photospots.data.TagApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,7 +12,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DataModule {
+object RetrofitModule {
 
     @Provides
     @Singleton

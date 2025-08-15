@@ -1,8 +1,8 @@
 package com.glebgol.photospots.data
 
-import com.glebgol.photospots.domain.CreateTagData
-import com.glebgol.photospots.domain.TagData
-import com.glebgol.photospots.domain.TagDetailsData
+import com.glebgol.photospots.domain.data.CreateTagData
+import com.glebgol.photospots.domain.data.TagData
+import com.glebgol.photospots.domain.data.TagDetailsData
 import com.glebgol.photospots.domain.TagRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

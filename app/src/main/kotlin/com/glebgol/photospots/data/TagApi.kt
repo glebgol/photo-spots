@@ -2,7 +2,6 @@ package com.glebgol.photospots.data
 
 import com.glebgol.photospots.data.dto.TagDetailsDto
 import com.glebgol.photospots.data.dto.TagDto
-import com.glebgol.photospots.domain.TagData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.GET

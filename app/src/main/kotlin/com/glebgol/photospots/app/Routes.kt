@@ -1,4 +1,4 @@
-package com.glebgol.photospots
+package com.glebgol.photospots.app
 
 import kotlinx.serialization.Serializable
 

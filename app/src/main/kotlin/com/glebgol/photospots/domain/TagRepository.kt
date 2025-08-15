@@ -1,5 +1,8 @@
 package com.glebgol.photospots.domain
 
+import com.glebgol.photospots.domain.data.CreateTagData
+import com.glebgol.photospots.domain.data.TagData
+import com.glebgol.photospots.domain.data.TagDetailsData
 import kotlinx.coroutines.flow.Flow
 
 interface TagRepository {
