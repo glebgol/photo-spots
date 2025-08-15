@@ -2,6 +2,7 @@ package com.glebgol.photospots
 
 import android.Manifest
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -10,24 +11,39 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.glebgol.photospots.presentation.TagsScreen
 import com.glebgol.photospots.presentation.TagsViewModel
 import com.glebgol.photospots.presentation.createtag.CreateTagScreen
+import com.glebgol.photospots.presentation.map.MapScreen
 import com.glebgol.photospots.presentation.tagdetails.TagDetailsScreen
 import com.glebgol.photospots.presentation.tagdetails.TagDetailsViewModel
 import com.glebgol.photospots.presentation.theme.PhotospotsTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.serialization.Serializable
+import org.osmdroid.config.Configuration
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -41,31 +57,52 @@ class MainActivity : ComponentActivity() {
             ),
             1
         )
+        loadOsmdroid()
         enableEdgeToEdge()
         setContent {
             PhotospotsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val navController = rememberNavController()
+                val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val isMainScreen = shouldShowBottomBar(navBackStackEntry)
+
+                val cameraPermissionLauncher = requestCameraLauncher {
+                    navController.navigate(Route.Create)
+                }
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        if (isMainScreen) {
+                            BottomNavigationBar(navController)
+                        }
+                    },
+                    floatingActionButton = {
+                        if (isMainScreen) {
+                            FloatingActionButton(onClick = {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    }) { innerPadding ->
 
                     NavHost(
                         navController = navController,
-                        startDestination = Route.Graph
+                        startDestination = Route.Graph,
+                        modifier = Modifier.padding(innerPadding)
                     ) {
                         navigation<Route.Graph>(
                             startDestination = Route.TagsListRoute
                         ) {
                             composable<Route.TagsListRoute> {
-                                val cameraPermissionLauncher = requestCameraLauncher {
-                                    navController.navigate(Route.Create)
-                                }
                                 TagsScreen(
                                     viewModel = hiltViewModel<TagsViewModel>(),
-                                    modifier = Modifier.padding(innerPadding),
+                                    modifier = Modifier,
                                     onTagClick = {
                                         navController.navigate(Route.TagDetailsRoute(it))
-                                    },
-                                    onTagCreateClick = {
-                                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                                     }
                                 )
                             }
@@ -73,6 +110,7 @@ class MainActivity : ComponentActivity() {
                             composable<Route.TagDetailsRoute> { entry ->
                                 val args = entry.toRoute<Route.TagDetailsRoute>()
                                 TagDetailsScreen(
+                                    modifier = Modifier,
                                     id = args.id,
                                     viewModel = hiltViewModel<TagDetailsViewModel>(),
                                     onBackClick = {
@@ -95,11 +133,31 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             }
+
+                            composable<Route.Map> { entry ->
+                                MapScreen(
+                                    modifier = Modifier
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun shouldShowBottomBar(navBackStackEntry: NavBackStackEntry?) =
+        navBackStackEntry?.destination?.route in setOf(
+            Route.TagsListRoute::class.qualifiedName,
+            Route.Map::class.qualifiedName
+        )
+
+    private fun loadOsmdroid() {
+        Configuration.getInstance().load(
+            applicationContext,
+            PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        )
     }
 
     @Composable
@@ -110,7 +168,8 @@ class MainActivity : ComponentActivity() {
             if (isGranted) {
                 onSuccess()
             } else {
-                Toast.makeText(this@MainActivity,
+                Toast.makeText(
+                    this@MainActivity,
                     R.string.permission_required,
                     Toast.LENGTH_SHORT
                 ).show()
@@ -118,16 +177,49 @@ class MainActivity : ComponentActivity() {
         }
 }
 
-sealed interface Route {
-    @Serializable
-    data object TagsListRoute: Route
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
-    @Serializable
-    data class TagDetailsRoute(val id: String): Route
-
-    @Serializable
-    data object Graph
-
-    @Serializable
-    data object Create
+    BottomAppBar {
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.List,
+                    contentDescription = "Tags list"
+                )
+            },
+            label = { Text(text = "Tags list") },
+            selected = currentDestination?.route == Route.TagsListRoute::class.qualifiedName,
+            onClick = {
+                navController.navigate(Route.TagsListRoute) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        )
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Map,
+                    contentDescription = "Map"
+                )
+            },
+            label = { Text(text = "Map") },
+            selected = currentDestination?.route == Route.Map::class.qualifiedName,
+            onClick = {
+                navController.navigate(Route.Map) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        )
+    }
 }

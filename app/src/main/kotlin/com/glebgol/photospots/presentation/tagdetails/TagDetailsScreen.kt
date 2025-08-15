@@ -1,13 +1,18 @@
 package com.glebgol.photospots.presentation.tagdetails
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,40 +68,56 @@ private fun TagDetailsContent(
     openOnMap: () -> Unit
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement
-            .spacedBy(20.dp, alignment = Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier.fillMaxSize()
     ) {
-        Button(onClick = onBackClick, modifier = Modifier.size(100.dp)) {
-            Text(text = "Back")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
         }
-        Text(text = "Something went wrong")
+
         val tag = state.tagDetails
         if (tag != null) {
-            AsyncImage(
-                model = tag.imageUrl,
-                contentDescription = null,
+            Column(
                 modifier = Modifier
-                    .heightIn(min = 400.dp)
-                    .fillMaxWidth(),
-                contentScale = ContentScale.FillWidth
-            )
-            HeartButton(
-                onClick = onLikeClick,
-                isFavourite = state.isFavourite
-            )
-            Button(onClick = onLikeClick) {
-                Text(text = "${state.isFavourite}")
+                    .fillMaxSize()
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(
+                    20.dp,
+                    alignment = Alignment.CenterVertically
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AsyncImage(
+                    model = tag.imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .heightIn(min = 400.dp)
+                        .fillMaxWidth(),
+                    contentScale = ContentScale.FillWidth
+                )
+
+                HeartButton(
+                    onClick = onLikeClick,
+                    isFavourite = state.isFavourite
+                )
+
+                Text(text = tag.description)
+
+                MapButton(
+                    onClick = openOnMap,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
-            MapButton(
-                onClick = openOnMap,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Text(text = tag.description)
-            Text(text = "Coordinates ${tag.latitude} ${tag.longitude}")
         }
     }
 }
