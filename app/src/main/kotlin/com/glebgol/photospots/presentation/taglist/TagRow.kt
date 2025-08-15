@@ -1,4 +1,4 @@
-package com.glebgol.photospots.presentation
+package com.glebgol.photospots.presentation.taglist
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,7 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.glebgol.photospots.domain.TagData
+import com.glebgol.photospots.domain.data.TagData
 
 @Composable
 fun TagRow(
@@ -46,8 +48,10 @@ fun TagRow(
                 .clip(CircleShape),
         )
         Text(text = tag.description)
-
-        Text(text = "${tag.isFavourite} ${tag.latitude} ${tag.longitude}")
+        Icon(
+            imageVector = Icons.Default.LocationOn,
+            contentDescription = null
+        )
     }
 }
 

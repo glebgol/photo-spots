@@ -1,6 +1,6 @@
 package com.glebgol.photospots.presentation.tagdetails
 
-import com.glebgol.photospots.domain.TagDetailsData
+import com.glebgol.photospots.domain.data.TagDetailsData
 
 data class TagDetailsState(
     val isLoading: Boolean = true,

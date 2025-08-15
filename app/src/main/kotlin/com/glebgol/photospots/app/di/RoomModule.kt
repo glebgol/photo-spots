@@ -1,8 +1,9 @@
-package com.glebgol.photospots.data
+package com.glebgol.photospots.app.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
+import com.glebgol.photospots.data.TagsLocalDataSource
+import com.glebgol.photospots.data.TagsRemoteDataSource
 import com.glebgol.photospots.data.retrofit.RetrofitTagsRemoteDataSource
 import com.glebgol.photospots.data.room.RoomTagsLocalDataSource
 import com.glebgol.photospots.data.room.dao.TagsDao
@@ -31,19 +32,4 @@ object RoomModule {
     @Provides
     @Singleton
     fun provideTagsDao(tagsDatabase: TagsDatabase): TagsDao = tagsDatabase.tagsDao
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-interface Module2 {
-
-    @Binds
-    fun bindLocalDataSource(
-        localDataSource: RoomTagsLocalDataSource
-    ): TagsLocalDataSource
-
-    @Binds
-    fun bindRemoteDataSource(
-        remoteDataSource: RetrofitTagsRemoteDataSource
-    ): TagsRemoteDataSource
 }

@@ -5,11 +5,10 @@ import com.glebgol.photospots.data.TagApi
 import com.glebgol.photospots.data.TagsRemoteDataSource
 import com.glebgol.photospots.data.dto.TagDetailsDto
 import com.glebgol.photospots.data.dto.TagDto
-import com.glebgol.photospots.domain.CreateTagData
+import com.glebgol.photospots.domain.data.CreateTagData
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject

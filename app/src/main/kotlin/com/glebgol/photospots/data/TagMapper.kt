@@ -3,8 +3,8 @@ package com.glebgol.photospots.data
 import com.glebgol.photospots.data.dto.TagDetailsDto
 import com.glebgol.photospots.data.dto.TagDto
 import com.glebgol.photospots.data.room.dao.TagEntity
-import com.glebgol.photospots.domain.TagData
-import com.glebgol.photospots.domain.TagDetailsData
+import com.glebgol.photospots.domain.data.TagData
+import com.glebgol.photospots.domain.data.TagDetailsData
 
 fun TagDto.mapToData(): TagData {
     return TagData(

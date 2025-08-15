@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.glebgol.photospots.domain.TagData
+import com.glebgol.photospots.domain.data.TagData
 import com.glebgol.photospots.presentation.tagdetails.TagDetailsScreen
 import com.glebgol.photospots.presentation.tagdetails.TagDetailsViewModel
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory

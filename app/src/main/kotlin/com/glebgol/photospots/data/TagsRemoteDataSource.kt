@@ -2,7 +2,7 @@ package com.glebgol.photospots.data
 
 import com.glebgol.photospots.data.dto.TagDetailsDto
 import com.glebgol.photospots.data.dto.TagDto
-import com.glebgol.photospots.domain.CreateTagData
+import com.glebgol.photospots.domain.data.CreateTagData
 
 interface TagsRemoteDataSource {
     suspend fun getTags(): List<TagDto>

@@ -1,4 +1,4 @@
-package com.glebgol.photospots.domain
+package com.glebgol.photospots.domain.data
 
 import android.graphics.Bitmap
 

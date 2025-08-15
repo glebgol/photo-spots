@@ -1,4 +1,4 @@
-package com.glebgol.photospots
+package com.glebgol.photospots.app
 
 import android.Manifest
 import android.os.Bundle
@@ -13,34 +13,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.glebgol.photospots.presentation.TagsScreen
-import com.glebgol.photospots.presentation.TagsViewModel
+import com.glebgol.photospots.R
 import com.glebgol.photospots.presentation.createtag.CreateTagScreen
 import com.glebgol.photospots.presentation.map.MapScreen
 import com.glebgol.photospots.presentation.tagdetails.TagDetailsScreen
 import com.glebgol.photospots.presentation.tagdetails.TagDetailsViewModel
+import com.glebgol.photospots.presentation.taglist.TagsScreen
+import com.glebgol.photospots.presentation.taglist.TagsViewModel
 import com.glebgol.photospots.presentation.theme.PhotospotsTheme
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
@@ -175,51 +169,4 @@ class MainActivity : ComponentActivity() {
                 ).show()
             }
         }
-}
-
-@Composable
-fun BottomNavigationBar(navController: NavController) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-
-    BottomAppBar {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.List,
-                    contentDescription = "Tags list"
-                )
-            },
-            label = { Text(text = "Tags list") },
-            selected = currentDestination?.route == Route.TagsListRoute::class.qualifiedName,
-            onClick = {
-                navController.navigate(Route.TagsListRoute) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Map,
-                    contentDescription = "Map"
-                )
-            },
-            label = { Text(text = "Map") },
-            selected = currentDestination?.route == Route.Map::class.qualifiedName,
-            onClick = {
-                navController.navigate(Route.Map) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
-        )
-    }
 }

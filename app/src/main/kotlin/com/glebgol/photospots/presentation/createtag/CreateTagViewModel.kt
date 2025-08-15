@@ -4,10 +4,7 @@ import android.graphics.Bitmap
 import androidx.camera.view.LifecycleCameraController
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.glebgol.photospots.domain.CreateTagData
-import com.glebgol.photospots.domain.TagRepository
-import com.glebgol.photospots.presentation.DefaultLocationClient
-import com.glebgol.photospots.presentation.LocationClient
+import com.glebgol.photospots.domain.usecases.CreateTagUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,8 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateTagViewModel @Inject constructor(
     private val photoTaker: CameraXPhotoTaker,
-    private val tagRepository: TagRepository,
-    private val locationClient: LocationClient
+    private val createTagUseCase: CreateTagUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateTagState())
@@ -44,15 +40,7 @@ class CreateTagViewModel @Inject constructor(
                 it.copy(isLoading = true)
             }
             bitmap.value?.let { image ->
-                val location = locationClient.getLocation()
-                val createTagData = CreateTagData(
-                    image = image,
-                    description = state.value.description,
-                    latitude = location.latitude,
-                    longitude = location.longitude
-                )
-
-                tagRepository.createTag(createTagData)
+                createTagUseCase.execute(image = image, description = state.value.description)
                     .onSuccess {
                         _state.update {
                             it.copy(isSuccess = true)
